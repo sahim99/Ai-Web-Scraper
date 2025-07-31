@@ -1,3 +1,6 @@
+
+![AI Web Scraper UI](./image.png)
+
 # 🔎 AI Web Scraper
 
 A modern, AI-powered web scraping tool that extracts specific information from any website using intelligent parsing.
