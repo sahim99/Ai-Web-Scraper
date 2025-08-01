@@ -7,12 +7,14 @@ A modern, AI-powered web scraping tool that extracts specific information from a
 
 ## ✨ Features
 
-- **🌐 Smart Web Scraping** - Fast, headless browser scraping
-- **🤖 AI-Powered Parsing** - Extract specific data using local LLM (Ollama)
-- **🎨 Modern UI** - Beautiful dark theme with gradient accents
-- **⚡ Ultra-Fast** - Optimized for speed and efficiency
-- **📊 Structured Output** - Clean, formatted results
+- **🌐 Smart Web Scraping** - Fast, headless browser scraping with optimized Chrome settings
+- **🤖 AI-Powered Parsing** - Extract specific data using local LLM (Ollama) with intelligent content structuring
+- **🎨 Modern UI** - Beautiful dark theme with gradient accents and responsive design
+- **⚡ Ultra-Fast** - Optimized for speed with progress tracking and dimming effects
+- **📊 Structured Output** - Clean, formatted results with no blank boxes
 - **🛠️ Easy Setup** - Simple installation and configuration
+- **🔄 Real-time Progress** - Visual progress bar with status updates during AI processing
+- **🎯 Smart Validation** - Intelligent result filtering to prevent empty or invalid outputs
 
 ## 🚀 Quick Start
 
@@ -68,16 +70,19 @@ The app will open at `http://localhost:8501`
 
 ### 3. Parse Content
 - Click "🚀 Parse Content"
+- Watch the progress bar with real-time status updates
 - AI will extract the requested information
-- Results appear in a clean, formatted table
+- Results appear in a clean, formatted card (no blank boxes!)
+- Right side dims during processing for better UX
 
 ## ⚙️ Settings
 
 ### Sidebar Options:
 - **Headless Mode** - Faster scraping (recommended ON)
-- **Page Load Wait Time** - How long to wait for page loading
+- **Page Load Wait Time** - How long to wait for page loading (1-5 seconds)
 - **AI Model** - Choose between llama3, gpt-4, mistral
-- **Max Chunk Size** - Size of content chunks for processing
+- **Max Chunk Size** - Size of content chunks for processing (2000-5000)
+- **📊 Statistics** - Track websites scraped and content parsed
 
 ## 🔧 Configuration
 
@@ -94,10 +99,17 @@ The AI model can be configured in `parse.py`:
 model = OllamaLLM(
     model="llama3",
     temperature=0.0,
-    max_tokens=80,
-    timeout=8
+    max_tokens=200,
+    timeout=15
 )
 ```
+
+### UI Customization
+The modern dark theme can be customized in `main.py`:
+- Gradient colors and backgrounds
+- Card styling and animations
+- Button hover effects
+- Progress bar styling
 
 ## 🛠️ Troubleshooting
 
@@ -122,10 +134,12 @@ model = OllamaLLM(
 
 ### Performance Tips:
 
-- ✅ Keep headless mode ON
+- ✅ Keep headless mode ON for faster scraping
 - ✅ Use smaller chunk sizes for better parsing
 - ✅ Be specific in extraction requests
 - ✅ Try different AI models for better results
+- ✅ Monitor progress bar for real-time feedback
+- ✅ Use the dimming effect to know when processing is active
 
 ## 📁 Project Structure
 
@@ -142,11 +156,20 @@ AI Web Scraper/
 
 ## 🔄 Updates
 
-### Recent Improvements:
+### Latest Improvements (v1.1):
+- ✅ **Progress Bar** - Real-time visual feedback during AI processing
+- ✅ **Dimming Effect** - Right side dims during processing for better UX
+- ✅ **Smart Validation** - No more blank boxes, only valid results displayed
+- ✅ **Enhanced UI** - Modern dark theme with gradient accents and hover effects
+- ✅ **Optimized Performance** - Faster scraping with improved Chrome settings
+- ✅ **Better Error Handling** - Comprehensive fallbacks and user-friendly messages
+- ✅ **Structured Content** - Intelligent content organization for better AI parsing
+- ✅ **Session Management** - Proper state handling and cleanup
+
+### Previous Improvements:
 - ✅ **Ultra-fast parsing** - Single chunk processing
 - ✅ **Structured data** - Preserves HTML structure
 - ✅ **Clean output** - No verbose explanations
-- ✅ **Better error handling** - Comprehensive fallbacks
 - ✅ **Modern UI** - Dark theme with gradients
 
 ## 🤝 Contributing
@@ -168,7 +191,28 @@ If you encounter issues:
 2. Run `python test_imports.py`
 3. Ensure all dependencies are installed
 4. Verify Ollama is running
+5. Check for blank boxes - they should no longer appear
+6. Monitor the progress bar for processing status
+
+## 🎯 Key Features Explained
+
+### Progress Tracking
+- **Visual Progress Bar**: Shows 4 stages of AI processing
+- **Status Updates**: Real-time text updates during processing
+- **Completion Feedback**: Clear success/error messages
+
+### Smart Validation
+- **No Blank Boxes**: Results card only appears with valid content
+- **Length Validation**: Ensures results have meaningful content (>10 characters)
+- **Type Checking**: Validates string format and content structure
+- **Error Filtering**: Excludes "No matching information found" responses
+
+### Enhanced UX
+- **Dimming Effect**: Right sidebar dims during processing
+- **Button States**: Interactive elements disabled during processing
+- **Clean Interface**: Modern cards and gradient styling
+- **Responsive Design**: Works on different screen sizes
 
 ---
 
-**Made with ❤️ using Streamlit | AI Web Scraper v1.0** 
+**Made with ❤️ using Streamlit | AI Web Scraper v1.1** 

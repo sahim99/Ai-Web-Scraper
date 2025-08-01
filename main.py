@@ -246,54 +246,93 @@ with col1:
         if parse_btn and parse_description:
             # Store current query
             st.session_state.current_query = parse_description
+            # Set processing state
+            st.session_state.is_processing = True
             
-            with st.spinner("🤖 Processing with AI..."):
-                try:
-                    from parse import perse_with_Ollama
-                    
-                    result = perse_with_Ollama(st.session_state.dom_content, parse_description)
-                    
-                    # Store the result
-                    st.session_state.parsed_result = result
-                    
-                    if result and result.strip() and result != "No matching information found":
-                        st.success("✅ Parsing complete!")
-                        st.markdown('<div class="card">', unsafe_allow_html=True)
-                        st.markdown("### 📋 Parsed Results")
-                        st.write(result)
-                        st.markdown('</div>', unsafe_allow_html=True)
-                    else:
-                        st.warning("⚠️ No matching information found")
-                        st.info("💡 Try being more specific in your query. For example:")
-                        st.code("""
+            # Create a progress bar for AI processing
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            # Update progress and status
+            status_text.text("🤖 Initializing AI processing...")
+            progress_bar.progress(25)
+            
+            status_text.text("🤖 Analyzing content structure...")
+            progress_bar.progress(50)
+            
+            status_text.text("🤖 Extracting information with AI...")
+            progress_bar.progress(75)
+            
+            try:
+                from parse import perse_with_Ollama
+                
+                result = perse_with_Ollama(st.session_state.dom_content, parse_description)
+                
+                # Complete the progress bar
+                status_text.text("🤖 Processing complete!")
+                progress_bar.progress(100)
+                
+                # Store the result
+                st.session_state.parsed_result = result
+                
+                if result and result.strip() and result != "No matching information found":
+                    st.success("✅ Parsing complete!")
+                else:
+                    st.warning("⚠️ No matching information found")
+                    st.info("💡 Try being more specific in your query. For example:")
+                    st.code("""
 • "Find information about the person named Sahim"
 • "Extract personal details and background"
 • "Get the name, skills, and experience"
 • "List all projects with technologies"
-                        """)
-                        
-                except Exception as e:
-                    st.error(f"❌ Error parsing content: {str(e)}")
-                    st.info("💡 Make sure Ollama is running: ollama serve")
+                    """)
+                    
+            except Exception as e:
+                st.error(f"❌ Error parsing content: {str(e)}")
+                st.info("💡 Make sure Ollama is running: ollama serve")
+            finally:
+                # Clear progress bar and status
+                progress_bar.empty()
+                status_text.empty()
+                # Clear processing state
+                st.session_state.is_processing = False
         
-        # Show results only if we have current results and they match the current query
-        elif "parsed_result" in st.session_state and "current_query" in st.session_state:
-            if st.session_state.current_query == parse_description:
+        # Show results ONLY if we have valid parsed results
+        if (parse_description and 
+            "parsed_result" in st.session_state and 
+            "current_query" in st.session_state and 
+            st.session_state.current_query == parse_description):
+            
+            result = st.session_state.parsed_result
+            
+            # Only show card if result is valid and not empty
+            if (result and 
+                isinstance(result, str) and
+                result.strip() and 
+                result != "No matching information found" and
+                len(result.strip()) > 10):
+                
                 st.markdown('<div class="card">', unsafe_allow_html=True)
                 st.markdown("### 📋 Parsed Results")
-                st.write(st.session_state.parsed_result)
+                st.write(result)
                 st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
+    # Check if processing is running and apply dimming effect
+    is_processing = st.session_state.get("is_processing", False)
+    
+    if is_processing:
+        st.markdown('<div style="opacity: 0.4; pointer-events: none;">', unsafe_allow_html=True)
+    
     st.markdown('<div class="section-header">💡 Quick Examples</div>', unsafe_allow_html=True)
     
-    if st.button("📰 News Website", use_container_width=True):
+    if st.button("📰 News Website", use_container_width=True, disabled=is_processing):
         st.info("Try scraping a news website like CNN, BBC, or Reuters")
     
-    if st.button("🛒 E-commerce Site", use_container_width=True):
+    if st.button("🛒 E-commerce Site", use_container_width=True, disabled=is_processing):
         st.info("Try scraping product information from Amazon, eBay, or Shopify stores")
     
-    if st.button("🏢 Company Website", use_container_width=True):
+    if st.button("🏢 Company Website", use_container_width=True, disabled=is_processing):
         st.info("Try scraping company information, contact details, or services")
     
     st.markdown("---")
@@ -309,6 +348,9 @@ with col2:
         </ul>
     </div>
     """, unsafe_allow_html=True)
+    
+    if is_processing:
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # --- FOOTER ---
 st.markdown("---")
