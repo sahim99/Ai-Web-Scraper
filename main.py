@@ -264,9 +264,9 @@ with col1:
             progress_bar.progress(75)
             
             try:
-                from parse import perse_with_Ollama
+                from parse import parse_with_groq
                 
-                result = perse_with_Ollama(st.session_state.dom_content, parse_description)
+                result = parse_with_groq(st.session_state.dom_content, parse_description)
                 
                 # Complete the progress bar
                 status_text.text("🤖 Processing complete!")

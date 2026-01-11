@@ -6,8 +6,7 @@ import re
 
 def scrape_website(website):
     print("Launching Chrome Browser...")
-
-    chrome_driver_path = "./chromedriver.exe"
+    
     options = webdriver.ChromeOptions()
     
     # Speed optimizations
@@ -31,7 +30,10 @@ def scrape_website(website):
     # Fastest page load strategy
     options.page_load_strategy = 'eager'
 
-    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service as ChromeService
+
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
     
     # Set timeouts for faster failure
     driver.set_page_load_timeout(8)
@@ -83,62 +85,23 @@ def extract_body_content(html_content):
 
 
 def clean_body_content(body_content):
-    """Clean content and output structured Project/Technologies pairs for perfect LLM extraction"""
+    """Clean content and output structured text for perfect LLM extraction"""
     if not body_content:
         return ""
     
     soup = BeautifulSoup(body_content, "html.parser")
-    for element in soup(["script", "style", "noscript", "iframe", "embed", "object", "form"]):
+    for element in soup(["script", "style", "noscript", "iframe", "embed", "object", "form", "svg"]):
         element.extract()
 
-    # Find all project sections
-    projects = []
-    current_project = None
-    current_techs = []
-    # Look for headings or bold text as project names
-    for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "b", "strong"]):
-        name = tag.get_text().strip()
-        if name and len(name) < 60 and any(word in name.lower() for word in ["project", "app", "dashboard", "portfolio", "work", "revamp", "chainvest", "sleepyowl", "weather", "airpods", "chatbot", "api"]):
-            if current_project and current_techs:
-                projects.append((current_project, list(current_techs)))
-            current_project = name
-            current_techs = []
-            # Look for next siblings as techs
-            sib = tag.find_next_sibling()
-            while sib and sib.name not in ["h1", "h2", "h3", "h4", "h5", "h6", "b", "strong"]:
-                sib_text = sib.get_text().strip()
-                # If it's a list, add all items
-                if sib.name in ["ul", "ol"]:
-                    for li in sib.find_all("li"):
-                        t = li.get_text().strip()
-                        if t and len(t) < 50:
-                            current_techs.append(t)
-                elif sib_text and len(sib_text) < 50:
-                    current_techs.append(sib_text)
-                sib = sib.find_next_sibling()
-    if current_project and current_techs:
-        projects.append((current_project, list(current_techs)))
-
-    # Fallback: Try to find project/tech pairs in paragraphs
-    if not projects:
-        for p in soup.find_all("p"):
-            txt = p.get_text().strip()
-            if ":" in txt and len(txt) < 100:
-                parts = txt.split(":", 1)
-                pname = parts[0].strip()
-                techs = [t.strip() for t in parts[1].split(",") if t.strip()]
-                if pname and techs:
-                    projects.append((pname, techs))
-
-    # Build structured output
-    output = []
-    for pname, techs in projects:
-        output.append(f"Project: {pname}\nTechnologies: {', '.join(techs)}\n")
-    if output:
-        return "\n".join(output)
-
-    # If nothing found, fallback to previous logic
-    return "No projects found.\n"
+    # Get text with separator
+    text = soup.get_text(separator="\n")
+    
+    # Clean up whitespace
+    lines = (line.strip() for line in text.splitlines())
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+    
+    return text
 
 
 def split_dom_content(dom_content, max_length=4000):
