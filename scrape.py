@@ -33,13 +33,21 @@ def scrape_website(website):
     # Check for system installed chromium (common in cloud environments)
     import shutil
     chrome_binary = shutil.which("chromium") or shutil.which("google-chrome")
+    chrome_driver_binary = shutil.which("chromedriver")
+
     if chrome_binary:
         options.binary_location = chrome_binary
 
-    from webdriver_manager.chrome import ChromeDriverManager
+    # Use system chromedriver if available (matches package version), else use webdriver-manager
     from selenium.webdriver.chrome.service import Service as ChromeService
+    
+    if chrome_driver_binary:
+         service = ChromeService(executable_path=chrome_driver_binary)
+    else:
+        from webdriver_manager.chrome import ChromeDriverManager
+        service = ChromeService(ChromeDriverManager().install())
 
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=service, options=options)
     
     # Set timeouts for faster failure
     driver.set_page_load_timeout(8)
