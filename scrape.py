@@ -29,6 +29,12 @@ def scrape_website(website):
     
     # Fastest page load strategy
     options.page_load_strategy = 'eager'
+    
+    # Check for system installed chromium (common in cloud environments)
+    import shutil
+    chrome_binary = shutil.which("chromium") or shutil.which("google-chrome")
+    if chrome_binary:
+        options.binary_location = chrome_binary
 
     from webdriver_manager.chrome import ChromeDriverManager
     from selenium.webdriver.chrome.service import Service as ChromeService
